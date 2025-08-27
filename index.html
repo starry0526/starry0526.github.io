@@ -1,246 +1,323 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ArtFlow • Impressionism Gallery</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ArtFlow • Impressionism</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f7f7f7;
-      color: #333;
+    :root{
+      --bg:#ffffff;
+      --text:#111827; /* gray-900 */
+      --muted:#6b7280; /* gray-500 */
+      --soft:#f3f4f6; /* gray-100 */
+      --card:#ffffff;
+      --border:#e5e7eb; /* gray-200 */
+      --accent:#111827; /* minimal dark */
+      --radius:18px;
+      --shadow:0 6px 30px rgba(0,0,0,.06);
     }
-    header {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      z-index: 100;
+    html,body{height:100%}
+    body{
+      margin:0; font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg); color: var(--text);
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.4rem;
-    }
-    #search {
-      padding: 6px 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 200px;
-    }
-    .controls {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #fff;
-      border-bottom: 1px solid #ddd;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .controls label {
-      background: #333;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #uploadInput {
-      display: none;
-    }
-    .filter-bar {
-      display: flex;
-      overflow-x: auto;
-      padding: 10px 20px;
-      background: white;
-      border-bottom: 1px solid #ddd;
-    }
-    .filter-btn {
-      margin-right: 12px;
-      padding: 6px 14px;
-      border: none;
-      background: #eee;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    .filter-btn.active {
-      background: #333;
-      color: white;
-    }
-    .section-title {
-      font-size: 1.2rem;
-      margin: 20px;
-    }
-    .gallery {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      padding: 0 20px 40px;
-    }
-    .card {
-      position: relative;
-      width: calc(33.3% - 10px);
-      background: white;
-      border-radius: 6px;
-      overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform .2s;
-    }
-    .card:hover {
-      transform: scale(1.02);
-    }
-    .card img {
-      width: 100%;
-      display: block;
-    }
-    .actions {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      display: flex;
-      gap: 8px;
-    }
-    .btn {
-      background: rgba(255, 255, 255, 0.8);
-      border: none;
-      padding: 6px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn:hover {
-      background: #eee;
-    }
-    .like-btn.liked {
-      color: #e74c3c;
-    }
+    /* Header */
+    .container{max-width:1200px; margin:0 auto; padding:24px}
+    .header{display:flex; gap:16px; align-items:center; justify-content:space-between; position:sticky; top:0; background:rgba(255,255,255,.8); backdrop-filter:saturate(180%) blur(8px); padding:16px 24px; border-bottom:1px solid var(--border); z-index:20}
+    .brand{display:flex; align-items:center; gap:12px}
+    .logo{width:36px; height:36px; border-radius:50%; background: conic-gradient(from 140deg, #eee, #ddd, #eee); display:grid; place-items:center; box-shadow: inset 0 0 0 1px var(--border)}
+    .logo svg{width:20px; height:20px}
+    .title{font-weight:700; letter-spacing:.2px}
+    .subtitle{color:var(--muted); font-size:14px}
 
-    @media (max-width: 900px) {
-      .card { width: calc(50% - 10px); }
-    }
+    /* Search */
+    .searchbar{flex:1; display:flex; align-items:center; gap:10px; max-width:560px; margin:0 24px}
+    .searchbar input{flex:1; padding:12px 14px; border:1px solid var(--border); background:var(--soft); border-radius:999px; outline:none}
+    .searchbar button{border:1px solid var(--border); background:var(--card); padding:10px 14px; border-radius:999px; cursor:pointer}
 
-    @media (max-width: 600px) {
-      .card { width: 100%; }
-      header { flex-direction: column; gap: 10px; align-items: flex-start; }
-    }
+    /* Actions */
+    .actions{display:flex; align-items:center; gap:10px}
+    .btn{background:var(--text); color:#fff; border:none; padding:10px 14px; border-radius:999px; cursor:pointer}
+    .btn.secondary{background:#fff; color:var(--text); border:1px solid var(--border)}
+
+    /* Filters */
+    .filters{display:flex; flex-wrap:wrap; gap:10px; padding:12px 24px; border-bottom:1px solid var(--border)}
+    .chip{padding:8px 12px; border-radius:999px; background:var(--soft); border:1px solid var(--border); cursor:pointer; font-size:14px}
+    .chip.active{background:#111827; color:#fff; border-color:#111827}
+
+    /* Masonry grid */
+    .masonry{column-count:1; column-gap:16px; padding:24px}
+    @media(min-width:640px){.masonry{column-count:2}}
+    @media(min-width:900px){.masonry{column-count:3}}
+    @media(min-width:1200px){.masonry{column-count:4}}
+    .card{break-inside:avoid; margin:0 0 16px; border-radius: var(--radius); overflow:clip; background:var(--card); border:1px solid var(--border); box-shadow: var(--shadow);}
+    .card figure{margin:0; position:relative}
+    .card img{display:block; width:100%; height:auto}
+    .card .overlay{position:absolute; inset:8px; display:flex; align-items:flex-start; justify-content:space-between; opacity:0; transition:opacity .2s}
+    .card:hover .overlay{opacity:1}
+    .pill{display:inline-flex; gap:8px; align-items:center; background:rgba(255,255,255,.9); border:1px solid var(--border); padding:6px 10px; border-radius:999px}
+    .toolbar{display:flex; gap:8px}
+    .iconbtn{background:rgba(255,255,255,.95); border:1px solid var(--border); padding:8px; border-radius:50%; cursor:pointer}
+    .meta{display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-top:1px solid var(--border)}
+    .meta .left{display:flex; gap:8px; align-items:center}
+    .avatar{width:26px; height:26px; border-radius:50%; background:#ddd}
+    .meta .right{display:flex; gap:10px; align-items:center; color:var(--muted); font-size:14px}
+
+    /* Comment drawer */
+    dialog{border:none; border-radius:20px; width:min(720px, 92vw); padding:0; box-shadow: var(--shadow)}
+    .dialog-head{display:flex; justify-content:space-between; align-items:center; padding:16px 18px; border-bottom:1px solid var(--border)}
+    .dialog-body{display:grid; grid-template-columns: 1fr 320px; gap:0; max-height:70vh}
+    .dialog-image{max-height:70vh; overflow:auto; background:#000}
+    .dialog-image img{width:100%; height:auto; display:block}
+    .comments{border-left:1px solid var(--border); padding:14px; overflow:auto}
+    .comment{padding:10px 0; border-bottom:1px dashed var(--border)}
+    .comment small{color:var(--muted)}
+    .comment-input{display:flex; gap:8px; margin-top:8px}
+    .comment-input input{flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:12px}
+
+    /* Footer */
+    footer{padding:32px; text-align:center; color:var(--muted)}
   </style>
 </head>
 <body>
+  <header class="header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <circle cx="12" cy="12" r="8"></circle>
+          <path d="M4 12h16M12 4v16"/>
+        </svg>
+      </div>
+      <div>
+        <div class="title">ArtFlow • Impressionism</div>
+        <div class="subtitle">แชร์งานศิลปะแนวอิมเพรสชันนิสม์ • มินิมอล</div>
+      </div>
+    </div>
 
-  <header>
-    <h1>🎨 ArtFlow • Impressionism</h1>
-    <input type="text" id="search" placeholder="ค้นหางาน..." oninput="renderGallery()">
+    <form class="searchbar" onsubmit="event.preventDefault()">
+      <input id="searchInput" type="search" placeholder="ค้นหาผลงาน ศิลปิน หรือคำสำคัญ…" aria-label="Search"/>
+      <button id="searchBtn" class="btn secondary" type="button" title="ค้นหา">ค้นหา</button>
+    </form>
+
+    <div class="actions">
+      <button id="uploadBtn" class="btn" title="อัพโหลดผลงาน">อัพโหลด</button>
+      <input id="filePicker" type="file" accept="image/*" multiple hidden>
+    </div>
   </header>
 
-  <div class="controls">
-    <label for="uploadInput">📤 อัปโหลดผลงาน</label>
-    <input type="file" id="uploadInput" accept="image/*" onchange="handleUpload(event)">
-  </div>
+  <nav class="filters" aria-label="ประเภทผลงาน">
+    <button class="chip active" data-filter="all">ทั้งหมด</button>
+    <button class="chip" data-filter="Landscape">Landscape</button>
+    <button class="chip" data-filter="Seascape">Seascape</button>
+    <button class="chip" data-filter="Portrait">Portrait</button>
+    <button class="chip" data-filter="Cityscape">Cityscape</button>
+    <button class="chip" data-filter="Still Life">Still Life</button>
+    <button class="chip" data-filter="Abstract">Abstract</button>
+    <button class="chip" data-filter="User Upload">User Upload</button>
+  </nav>
 
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="toggleFilter('all', this)">ทั้งหมด</button>
-    <button class="filter-btn" onclick="toggleFilter('landscape', this)">Landscape</button>
-    <button class="filter-btn" onclick="toggleFilter('portrait', this)">Portrait</button>
-    <button class="filter-btn" onclick="toggleFilter('urban', this)">เมือง</button>
-    <button class="filter-btn" onclick="toggleFilter('nature', this)">ธรรมชาติ</button>
-  </div>
+  <main class="masonry" id="gallery" aria-live="polite"></main>
 
-  <div class="section-title">🌟 ผลงานแนะนำ</div>
-  <div class="gallery" id="featuredGallery"></div>
+  <footer>© 2025 ArtFlow • Impressionism — ตัวอย่างหน้าเว็บแบบมินิมอล</footer>
 
-  <div class="section-title">🖼️ ผลงานทั้งหมด</div>
-  <div class="gallery" id="gallery"></div>
+  <dialog id="commentDialog">
+    <div class="dialog-head">
+      <strong id="dlgTitle">รายละเอียดผลงาน</strong>
+      <button id="dlgClose" class="iconbtn" title="ปิด">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l12 12M6 18L18 6"/></svg>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <div class="dialog-image"><img id="dlgImage" alt="Artwork"/></div>
+      <aside class="comments">
+        <div id="dlgMeta" style="margin-bottom:8px;color:var(--muted)"></div>
+        <div id="commentList"></div>
+        <div class="comment-input">
+          <input id="commentText" type="text" placeholder="พิมพ์คอมเมนต์…"/>
+          <button id="commentSend" class="btn secondary">ส่ง</button>
+        </div>
+      </aside>
+    </div>
+  </dialog>
 
   <script>
-    const tags = ['landscape','portrait','nature','urban'];
-    const images = [];
-    const featured = [];
-    const activeFilters = new Set(['all']);
-    const searchInput = document.getElementById('search');
+    // ------ Sample Data (uses Unsplash Featured for impressionism/painting keywords) ------
+    const sampleArtworks = [
+      { id: 's1', title: 'Morning Light', author: 'Claude-esque', category: 'Landscape', src: 'https://source.unsplash.com/600x800/?impressionism,painting&sig=11' },
+      { id: 's2', title: 'Harbor Mist', author: 'Seaside Study', category: 'Seascape', src: 'https://source.unsplash.com/600x900/?impressionist,sea,painting&sig=22' },
+      { id: 's3', title: 'City at Dusk', author: 'Urban Brush', category: 'Cityscape', src: 'https://source.unsplash.com/600x750/?impressionism,city,painting&sig=33' },
+      { id: 's4', title: 'Lilies Dream', author: 'Garden Notes', category: 'Still Life', src: 'https://source.unsplash.com/600x860/?impressionism,flowers,painting&sig=44' },
+      { id: 's5', title: 'Soft Gaze', author: 'Pastel Faces', category: 'Portrait', src: 'https://source.unsplash.com/600x780/?impressionism,portrait,painting&sig=55' },
+      { id: 's6', title: 'Color Tide', author: 'Motion Study', category: 'Abstract', src: 'https://source.unsplash.com/600x820/?impressionism,abstract,painting&sig=66' }
+    ];
 
-    function getRandomImage(tag) {
-      return `https://source.unsplash.com/400x600/?impressionism,${tag},art&sig=${Math.random()}`;
-    }
+    // Local state + persistence
+    const state = {
+      items: [...sampleArtworks],
+      likes: JSON.parse(localStorage.getItem('af_likes')||'{}'),
+      comments: JSON.parse(localStorage.getItem('af_comments')||'{}')
+    };
+    const saveLikes = ()=> localStorage.setItem('af_likes', JSON.stringify(state.likes));
+    const saveComments = ()=> localStorage.setItem('af_comments', JSON.stringify(state.comments));
 
-    function loadImages(num = 20) {
-      for (let i = 0; i < num; i++) {
-        const t = tags[Math.floor(Math.random() * tags.length)];
-        const img = {
-          src: getRandomImage(t),
-          tags: [t],
-          liked: false
-        };
-        images.push(img);
-      }
-      // ใส่ 3 รูปแรกไว้ใน "แนะนำ"
-      featured.push(...images.slice(0, 3));
-      renderGallery();
-    }
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-    function renderGallery() {
-      const q = searchInput.value.toLowerCase();
-      const gallery = document.getElementById('gallery');
-      const featuredGallery = document.getElementById('featuredGallery');
+    // ------- Rendering -------
+    const gallery = $('#gallery');
+    function render(items){
       gallery.innerHTML = '';
-      featuredGallery.innerHTML = '';
-
-      const filterFn = img =>
-        (activeFilters.has('all') || img.tags.some(t => activeFilters.has(t))) &&
-        (!q || img.tags.some(t => t.includes(q)));
-
-      featured.filter(filterFn).forEach((img, i) => {
-        featuredGallery.appendChild(createCard(img, `f-${i}`));
+      items.forEach(item=>{
+        const likeCount = state.likes[item.id]||0;
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.dataset.category = item.category;
+        card.innerHTML = `
+          <figure>
+            <img src="${item.src}" alt="${item.title} – ${item.author}" loading="lazy"/>
+            <div class="overlay">
+              <span class="pill">${item.category}</span>
+              <div class="toolbar">
+                <button class="iconbtn like" aria-label="กดไลค์" data-id="${item.id}">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12.1 8.64l-.1.1-.1-.1C10.14 6.88 7.1 7.28 5.6 9.09c-1.4 1.7-1.2 4.22.6 5.62L12 20l5.8-5.29c1.8-1.4 2-3.92.6-5.62-1.5-1.8-4.55-2.21-6.3-.45z"/></svg>
+                </button>
+                <button class="iconbtn comment" aria-label="คอมเมนต์" data-id="${item.id}">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3 1.5-4.5A4 4 0 0 1 4 15V7a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4z"/></svg>
+                </button>
+              </div>
+            </div>
+          </figure>
+          <div class="meta">
+            <div class="left">
+              <div class="avatar" aria-hidden="true"></div>
+              <div>
+                <div style="font-weight:600">${item.title}</div>
+                <div style="font-size:13px;color:var(--muted)">${item.author}</div>
+              </div>
+            </div>
+            <div class="right">
+              <span class="likes" data-id="${item.id}" title="จำนวนไลค์">❤ ${likeCount}</span>
+            </div>
+          </div>
+        `;
+        gallery.appendChild(card);
       });
+    }
 
-      images.filter(filterFn).forEach((img, i) => {
-        gallery.appendChild(createCard(img, i));
+    // Initial render
+    render(state.items);
+
+    // ------- Filters -------
+    $$('.chip').forEach(ch=>{
+      ch.addEventListener('click', ()=>{
+        $$('.chip').forEach(c=>c.classList.remove('active'));
+        ch.classList.add('active');
+        const f = ch.dataset.filter;
+        const q = $('#searchInput').value.trim().toLowerCase();
+        const filtered = state.items.filter(it=>{
+          const passCat = f==='all' ? true : it.category===f;
+          const passQuery = !q || `${it.title} ${it.author} ${it.category}`.toLowerCase().includes(q);
+          return passCat && passQuery;
+        });
+        render(filtered);
       });
+    });
+
+    // ------- Search -------
+    function applySearch(){
+      const fbtn = $$('.chip.active')[0];
+      const f = fbtn ? fbtn.dataset.filter : 'all';
+      const q = $('#searchInput').value.trim().toLowerCase();
+      const filtered = state.items.filter(it=>{
+        const passCat = f==='all' ? true : it.category===f;
+        const passQuery = !q || `${it.title} ${it.author} ${it.category}`.toLowerCase().includes(q);
+        return passCat && passQuery;
+      });
+      render(filtered);
+    }
+    $('#searchBtn').addEventListener('click', applySearch);
+    $('#searchInput').addEventListener('input', ()=>{
+      // live search
+      applySearch();
+    });
+
+    // ------- Likes & Comments -------
+    gallery.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button.iconbtn');
+      if(!btn) return;
+      const id = btn.dataset.id;
+      const item = state.items.find(x=>x.id===id);
+      if(btn.classList.contains('like')){
+        state.likes[id] = (state.likes[id]||0) + 1;
+        saveLikes();
+        const likeEl = gallery.querySelector(`.likes[data-id="${id}"]`);
+        if(likeEl) likeEl.textContent = `❤ ${state.likes[id]}`;
+      }
+      if(btn.classList.contains('comment')){
+        openComments(item);
+      }
+    });
+
+    function openComments(item){
+      const dlg = $('#commentDialog');
+      $('#dlgTitle').textContent = item.title;
+      $('#dlgImage').src = item.src;
+      $('#dlgMeta').textContent = `${item.author} • ${item.category}`;
+      renderComments(item.id);
+      dlg.showModal();
     }
 
-    function createCard(img, index) {
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <img src="${img.src}" alt="artwork">
-        <div class="actions">
-          <button class="btn like-btn ${img.liked ? 'liked' : ''}" onclick="toggleLike(${index}, this, ${index.toString().startsWith('f')})">♥</button>
-          <button class="btn" onclick="downloadImage('${img.src}')">⬇️</button>
-        </div>
-      `;
-      return div;
+    function renderComments(id){
+      const list = $('#commentList');
+      const arr = state.comments[id]||[];
+      list.innerHTML = arr.length? '' : '<div class="comment" style="color:var(--muted)">ยังไม่มีคอมเมนต์</div>';
+      arr.forEach(c=>{
+        const div = document.createElement('div');
+        div.className = 'comment';
+        div.innerHTML = `<div>${escapeHtml(c.text)}</div><small>${new Date(c.time).toLocaleString()}</small>`;
+        list.appendChild(div);
+      });
+      $('#commentText').value='';
+      $('#commentSend').onclick = ()=>{
+        const text = $('#commentText').value.trim();
+        if(!text) return;
+        const obj = {text, time: Date.now()};
+        state.comments[id] = [...(state.comments[id]||[]), obj];
+        saveComments();
+        renderComments(id);
+      };
+    }
+    $('#dlgClose').addEventListener('click', ()=> $('#commentDialog').close());
+
+    function escapeHtml(str){
+      return str.replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
     }
 
-    function toggleLike(index, btn, isFeatured = false) {
-      const imgList = isFeatured ? featured : images;
-      imgList[index].liked = !imgList[index].liked;
-      btn.classList.toggle('liked', imgList[index].liked);
+    // ------- Upload -------
+    $('#uploadBtn').addEventListener('click', ()=> $('#filePicker').click());
+    $('#filePicker').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files||[]);
+      if(!files.length) return;
+      for(const file of files){
+        const dataUrl = await fileToDataURL(file);
+        const id = 'u_' + Math.random().toString(36).slice(2,9);
+        const item = { id, title: file.name.replace(/\.[^.]+$/, ''), author: 'คุณ', category: 'User Upload', src: dataUrl };
+        state.items.unshift(item);
+      }
+      render(state.items);
+      e.target.value = '';
+    });
+    function fileToDataURL(file){
+      return new Promise(res=>{ const r=new FileReader(); r.onload=()=>res(r.result); r.readAsDataURL(file); });
     }
 
-    function downloadImage(src) {
-      const a = document.createElement('a');
-      a.href = src;
-      a.download = 'artwork.jpg';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function toggleFilter(tag, btn) {
-      const buttons = document.querySelectorAll('.filter-btn');
-      if (tag === 'all') {
-        activeFilters.clear();
-        activeFilters.add('all');
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      } else {
-        activeFilters.delete('all');
-        btn.classList.toggle('active');
-        document.querySelector('.filter-btn[onclick*="\'all\'"]').classList.remove('active');
-        if (!document.querySelector('.filter
+    // Accessibility: close dialog on backdrop click
+    $('#commentDialog').addEventListener('click', (e)=>{
+      const dlg = e.currentTarget;
+      const rect = dlg.getBoundingClientRect();
+      const inside = e.clientX>rect.left && e.clientX<rect.right && e.clientY>rect.top && e.clientY<rect.bottom;
+      if(!inside) dlg.close();
+    });
+  </script>
+</body>
+</html>
