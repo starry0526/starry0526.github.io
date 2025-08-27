@@ -1,115 +1,106 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ArtFlow - Impressionism Feed</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArtFlow • Impressionism Gallery</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
+      font-family: 'Sans-Serif';
+      background-color: #f5f5f5;
       color: #333;
     }
     header {
       position: sticky;
       top: 0;
-      background: white;
-      padding: 10px 20px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      z-index: 100;
+      background: #fff;
+      padding: 15px 20px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 10;
     }
     header h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 1.5rem;
     }
     #search {
-      padding: 5px 10px;
+      padding: 6px 10px;
+      font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 16px;
       width: 200px;
     }
     .filter-bar {
       display: flex;
       overflow-x: auto;
+      background: #fff;
       padding: 10px 20px;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #ddd;
     }
     .filter-btn {
-      background: #ddd;
-      border: none;
+      margin-right: 12px;
       padding: 6px 14px;
-      margin-right: 10px;
-      border-radius: 4px;
+      border: none;
+      background: #eee;
+      border-radius: 20px;
       cursor: pointer;
+      font-size: 0.9rem;
       white-space: nowrap;
-      font-size: 14px;
+      transition: background 0.2s;
     }
     .filter-btn.active {
-      background: #555;
-      color: white;
+      background: #333;
+      color: #fff;
     }
     .gallery {
-      column-count: 3;
-      column-gap: 8px;
-      max-width: 1200px;
-      margin: 20px auto;
-      padding: 0 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
     }
-    .item {
+    .card {
       position: relative;
-      break-inside: avoid-column;
-      margin-bottom: 10px;
-      background: white;
-      border-radius: 5px;
+      width: calc(33% - 20px);
+      background: #fff;
+      border-radius: 6px;
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
+      transition: transform .2s;
     }
-    .item:hover {
-      transform: scale(1.01);
-    }
-    .item img {
+    .card:hover { transform: scale(1.02); }
+    .card img {
       width: 100%;
       display: block;
     }
     .like-btn {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.8);
-      border: none;
-      padding: 6px;
-      border-radius: 50%;
+      top: 8px; right: 8px;
+      font-size: 1.3rem;
+      color: rgba(0,0,0,0.5);
       cursor: pointer;
-      font-size: 18px;
-      color: #e74c3c;
+      transition: color 0.2s;
     }
-    .like-btn.liked {
-      color: #c0392b;
+    .like-btn.liked { color: #e74c3c; }
+    @media (max-width: 900px) {
+      .card { width: calc(50% - 20px); }
     }
-    @media (max-width: 768px) {
-      .gallery { column-count: 2; }
-    }
-    @media (max-width: 480px) {
-      header { flex-direction: column; align-items: flex-start; }
-      .gallery { column-count: 1; }
+    @media (max-width: 600px) {
+      .card { width: calc(100% - 20px); }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>ArtFlow: สไตล์ Impressionism</h1>
-    <input type="text" id="search" placeholder="ค้นหางานศิลปะ..." oninput="applyFilters()" />
+    <h1>ArtFlow • Impressionism</h1>
+    <input id="search" type="text" placeholder="ค้นหา..." oninput="renderGallery()">
   </header>
 
-  <div class="filter-bar" id="filters">
+  <div class="filter-bar" id="filterBar">
     <button class="filter-btn active" onclick="toggleFilter('all', this)">ทั้งหมด</button>
     <button class="filter-btn" onclick="toggleFilter('landscape', this)">Landscape</button>
     <button class="filter-btn" onclick="toggleFilter('portrait', this)">Portrait</button>
@@ -117,58 +108,44 @@
     <button class="filter-btn" onclick="toggleFilter('urban', this)">เมือง</button>
   </div>
 
-  <div class="gallery" id="gallery">
-    <!-- งานตัวอย่างเยอะหน่อย -->
-    <div class="item" data-tags="landscape,nature">
-      <img src="https://source.unsplash.com/400x600/?impressionism,painting" alt="artwork">
-      <button class="like-btn" onclick="toggleLike(this)">♡</button>
-    </div>
-    <div class="item" data-tags="portrait">
-      <img src="https://source.unsplash.com/400x600/?impressionism,portrait" alt="artwork">
-      <button class="like-btn" onclick="toggleLike(this)">♡</button>
-    </div>
-    <div class="item" data-tags="urban">
-      <img src="https://source.unsplash.com/400x600/?impressionism,city" alt="artwork">
-      <button class="like-btn" onclick="toggleLike(this)">♡</button>
-    </div>
-    <!-- เพิ่มอีกได้ตามต้องการ -->
-  </div>
+  <div class="gallery" id="gallery"></div>
 
   <script>
+    const images = [];
+    const tags = ['landscape','portrait','nature','urban'];
     const activeFilters = new Set(['all']);
-    const searchInput = document.getElementById('search');
     const gallery = document.getElementById('gallery');
+    const searchInput = document.getElementById('search');
 
-    function toggleLike(btn) {
-      btn.classList.toggle('liked');
-      btn.textContent = btn.classList.contains('liked') ? '♥' : '♡';
-    }
-
-    function toggleFilter(tag, btn) {
-      if (tag === 'all') {
-        activeFilters.clear();
-        activeFilters.add('all');
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-      } else {
-        activeFilters.delete('all');
-        btn.classList.toggle('active');
-        document.querySelector('.filter-btn[onclick*="toggleFilter(\'all\'"]').classList.remove('active');
+    function loadImages(num = 24) {
+      for (let i = 0; i < num; i++) {
+        const t = tags[Math.floor(Math.random() * tags.length)];
+        images.push({
+          src: `https://source.unsplash.com/400x600/?impressionism,${t}`,
+          tags: [t],
+          liked: false
+        });
       }
-      applyFilters();
+      renderGallery();
     }
 
-    function applyFilters() {
-      const q = searchInput.value.toLowerCase();
-      gallery.querySelectorAll('.item').forEach(item => {
-        const tags = item.dataset.tags.split(',');
-        const matchesFilter = activeFilters.has('all') || tags.some(t => activeFilters.has(t));
-        const alt = item.querySelector('img').alt.toLowerCase();
-        const matchesSearch = alt.includes(q);
-        item.style.display = matchesFilter && matchesSearch ? '' : 'none';
+    function renderGallery() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      gallery.innerHTML = '';
+      images.forEach((imgObj, idx) => {
+        if (!activeFilters.has('all') && !imgObj.tags.some(t => activeFilters.has(t))) return;
+        if (searchTerm && !imgObj.tags.some(t => t.includes(searchTerm))) return;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${imgObj.src}" alt="Impressionism">
+          <div class="like-btn ${imgObj.liked ? 'liked' : ''}" onclick="toggleLike(${idx}, this)">
+            ♥
+          </div>`;
+        gallery.append(card);
       });
     }
-  </script>
 
-</body>
-</html>
+    function toggleLike(index, btnEl) {
+      images[index].liked = !images[index].liked;
